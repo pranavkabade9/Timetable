@@ -81,22 +81,23 @@ const TimeWidget = () => {
     <motion.div 
       initial={{ y: -20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
-      className="glass px-6 py-3 flex flex-col items-end gap-1"
+      className="glass px-2 py-1 md:px-6 md:py-3 flex flex-col items-end gap-0 md:gap-1"
     >
-      <div className="flex items-center gap-3">
-        <span className="text-2xl font-light tracking-tight">
+      <div className="flex items-center gap-1.5 md:gap-3">
+        <span className="text-sm md:text-2xl font-light tracking-tight">
           {format(now, 'h:mm a')}
         </span>
         <div className={cn(
-          "w-2 h-2 rounded-full",
+          "w-1 h-1 md:w-2 md:h-2 rounded-full",
           isWorkingHours ? "bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.6)]" : "bg-slate-400"
         )} />
       </div>
       <div className="flex flex-col items-end">
-        <span className="text-xs font-medium opacity-60 uppercase tracking-widest">
-          {format(now, 'EEEE, d MMM')}
+        <span className="text-[10px] md:text-xs font-medium opacity-60 uppercase tracking-wider md:tracking-widest">
+          <span className="hidden md:inline">{format(now, 'EEEE, d MMM')}</span>
+          <span className="md:hidden">{format(now, 'EEE, MMM d')}</span>
         </span>
-        <span className="text-[10px] opacity-40 uppercase tracking-tighter">
+        <span className="text-[8px] md:text-[10px] opacity-40 uppercase tracking-tighter hidden md:inline">
           {isWorkingHours ? "College Hours" : "Outside Hours"}
         </span>
       </div>
@@ -357,43 +358,43 @@ export default function App() {
       <Wallpaper />
       
       {/* --- Header --- */}
-      <header className="fixed top-0 left-0 right-0 h-20 px-8 flex items-center justify-between z-40">
-        <div className="flex items-center gap-4">
-          <div className="w-10 h-10 glass flex items-center justify-center">
-            <LayoutDashboard className="w-5 h-5 text-indigo-500" />
+      <header className="fixed top-0 left-0 right-0 h-16 md:h-20 px-4 md:px-8 flex items-center justify-between z-40">
+        <div className="flex items-center gap-2 md:gap-4">
+          <div className="w-8 h-8 md:w-10 md:h-10 glass flex items-center justify-center">
+            <LayoutDashboard className="w-4 h-4 md:w-5 md:h-5 text-indigo-500" />
           </div>
           <div>
-            <h1 className="text-lg font-semibold tracking-tight">Academic Time Table</h1>
-            <p className="text-[10px] opacity-50 uppercase tracking-widest font-bold">Academic Workspace</p>
+            <h1 className="text-sm md:text-lg font-semibold tracking-tight truncate max-w-[120px] md:max-w-none">Academic Time Table</h1>
+            <p className="text-[8px] md:text-[10px] opacity-50 uppercase tracking-widest font-bold hidden md:block">Academic Workspace</p>
           </div>
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 md:gap-4">
           <TimeWidget />
           
           <button 
             onClick={() => setIsDarkMode(!isDarkMode)}
-            className="w-10 h-10 glass flex items-center justify-center hover:bg-white/20 transition-colors"
+            className="w-8 h-8 md:w-10 md:h-10 glass flex items-center justify-center hover:bg-white/20 transition-colors"
           >
-            {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+            {isDarkMode ? <Sun className="w-4 h-4 md:w-5 md:h-5" /> : <Moon className="w-4 h-4 md:w-5 md:h-5" />}
           </button>
 
           <button 
             onClick={() => setIsPanelOpen(true)}
-            className="w-10 h-10 glass flex items-center justify-center hover:bg-white/20 transition-colors relative"
+            className="w-8 h-8 md:w-10 md:h-10 glass flex items-center justify-center hover:bg-white/20 transition-colors relative"
           >
-            <History className="w-5 h-5" />
+            <History className="w-4 h-4 md:w-5 md:h-5" />
             {activities.length > 0 && (
-              <span className="absolute top-2 right-2 w-2 h-2 bg-indigo-500 rounded-full border-2 border-white/20" />
+              <span className="absolute top-1.5 right-1.5 md:top-2 md:right-2 w-1.5 h-1.5 md:w-2 md:h-2 bg-indigo-500 rounded-full border-2 border-white/20" />
             )}
           </button>
         </div>
       </header>
 
       {/* --- Main Content --- */}
-      <main className="pt-28 pb-12 px-8 max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 h-[calc(100vh-2rem)]">
-        {/* Left Sidebar / Controls */}
-        <div className="lg:col-span-3 space-y-6">
+      <main className="pt-20 md:pt-28 pb-20 md:pb-12 px-4 md:px-8 max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8 h-screen md:h-[calc(100vh-2rem)]">
+        {/* Left Sidebar / Controls - Hidden on mobile, replaced by bottom nav */}
+        <div className="hidden lg:block lg:col-span-3 space-y-6">
           <motion.div 
             initial={{ x: -20, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
@@ -444,18 +445,18 @@ export default function App() {
         </div>
 
         {/* Center Content */}
-        <div className="lg:col-span-9 overflow-hidden flex flex-col gap-6">
+        <div className="lg:col-span-9 overflow-hidden flex flex-col gap-4 md:gap-6">
           <motion.div 
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             className="glass-panel flex-1 overflow-hidden flex flex-col"
           >
-            <div className="p-6 border-b border-white/10 flex items-center justify-between">
+            <div className="p-4 md:p-6 border-b border-white/10 flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div>
-                <h2 className="text-xl font-semibold">Weekly Timetable</h2>
-                <div className="flex items-center gap-4 mt-1">
-                  <p className="text-xs opacity-50">Tuesday – Saturday • 9:00 AM – 5:00 PM</p>
-                  <div className="h-3 w-[1px] bg-white/10" />
+                <h2 className="text-lg md:text-xl font-semibold">Weekly Timetable</h2>
+                <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mt-1">
+                  <p className="text-[10px] md:text-xs opacity-50">Tue – Sat • 9:00 AM – 5:00 PM</p>
+                  <div className="hidden md:block h-3 w-[1px] bg-white/10" />
                   <div className="flex items-center gap-3">
                     <span className="text-[10px] font-bold uppercase tracking-widest opacity-40">Show:</span>
                     <label className="flex items-center gap-2 cursor-pointer group">
@@ -492,33 +493,34 @@ export default function App() {
                 </div>
               </div>
               <div className="flex gap-2">
-                <div className="flex items-center gap-1.5 px-2 py-1 rounded-full glass text-[10px] uppercase font-bold tracking-tighter opacity-70">
+                <div className="flex items-center gap-1.5 px-2 py-1 rounded-full glass text-[8px] md:text-[10px] uppercase font-bold tracking-tighter opacity-70">
                   <div className="w-1.5 h-1.5 rounded-full bg-blue-400" />
                   Lecture
                 </div>
-                <div className="flex items-center gap-1.5 px-2 py-1 rounded-full glass text-[10px] uppercase font-bold tracking-tighter opacity-70">
+                <div className="flex items-center gap-1.5 px-2 py-1 rounded-full glass text-[8px] md:text-[10px] uppercase font-bold tracking-tighter opacity-70">
                   <div className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
                   Lab
                 </div>
               </div>
             </div>
 
-            <div className="flex-1 overflow-auto p-4 custom-scrollbar">
-              <div className="min-w-[800px]">
-                <div className="grid grid-cols-[100px_repeat(5,1fr)] border border-white/10 rounded-xl overflow-hidden glass">
+            <div className="flex-1 overflow-auto p-2 md:p-4 custom-scrollbar">
+              <div className="min-w-[700px] md:min-w-[800px]">
+                <div className="grid grid-cols-[80px_repeat(5,1fr)] md:grid-cols-[100px_repeat(5,1fr)] border border-white/10 rounded-xl overflow-hidden glass">
                   {/* Header */}
-                  <div className="bg-white/5 p-4 border-b border-r border-white/10 font-bold text-[10px] uppercase opacity-50">Time</div>
+                  <div className="bg-white/5 p-2 md:p-4 border-b border-r border-white/10 font-bold text-[8px] md:text-[10px] uppercase opacity-50">Time</div>
                   {['Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map(day => (
-                    <div key={day} className="bg-white/5 p-4 border-b border-r border-white/10 font-bold text-[10px] uppercase opacity-50 text-center">
-                      {day}
+                    <div key={day} className="bg-white/5 p-2 md:p-4 border-b border-r border-white/10 font-bold text-[8px] md:text-[10px] uppercase opacity-50 text-center">
+                      <span className="hidden md:inline">{day}</span>
+                      <span className="md:hidden">{day.substring(0, 3)}</span>
                     </div>
                   ))}
                   
                   {/* Rows */}
                   {Array.from({ length: 9 }, (_, i) => i + 9).map(hour => (
                     <React.Fragment key={hour}>
-                      <div className="p-4 border-b border-r border-white/10 text-[10px] font-bold opacity-40 flex items-center justify-center">
-                        {format(setHours(new Date(), hour), 'h:00 a')}
+                      <div className="p-2 md:p-4 border-b border-r border-white/10 text-[8px] md:text-[10px] font-bold opacity-40 flex items-center justify-center">
+                        {format(setHours(new Date(), hour), 'h a')}
                       </div>
                       {['Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map(day => {
                         const dayEvents = activeEvents.filter(e => {
@@ -529,33 +531,33 @@ export default function App() {
                         });
                         
                         return (
-                          <div key={day} className="p-1 border-b border-r border-white/10 min-h-[100px] bg-white/[0.02]">
+                          <div key={day} className="p-1 border-b border-r border-white/10 min-h-[80px] md:min-h-[100px] bg-white/[0.02]">
                             {dayEvents.map(event => (
                               <div key={event.id} className={cn(
-                                "p-2 rounded-lg text-[10px] font-medium mb-1 shadow-sm border animate-in fade-in zoom-in-95 duration-300",
+                                "p-1.5 md:p-2 rounded-lg text-[8px] md:text-[10px] font-medium mb-1 shadow-sm border animate-in fade-in zoom-in-95 duration-300",
                                 event.type === 'lecture' ? 'bg-blue-500/10 text-blue-500 border-blue-500/30' :
                                 'bg-emerald-500/10 text-emerald-500 border-emerald-500/30'
                               )}>
-                                <div className="font-bold truncate text-sm mb-0.5">{event.subject}</div>
-                                <div className="opacity-70 flex items-center gap-1 mb-0.5">
-                                  <span className="opacity-50">Prof.</span> {event.faculty}
+                                <div className="font-bold truncate text-xs md:text-sm mb-0.5">{event.subject}</div>
+                                <div className="opacity-70 flex items-center gap-1 mb-0.5 truncate">
+                                  <span className="opacity-50 hidden md:inline">Prof.</span> {event.faculty}
                                 </div>
-                                <div className="opacity-70 flex items-center gap-1 mb-1">
-                                  <span className="opacity-50">Room</span> {event.room}
+                                <div className="opacity-70 flex items-center gap-1 mb-1 truncate">
+                                  <span className="opacity-50 hidden md:inline">Room</span> {event.room}
                                 </div>
-                                <div className="flex items-center justify-between mt-2 pt-1 border-t border-current/10">
-                                  <span className="font-bold uppercase tracking-tighter">
-                                    {event.type === 'lecture' ? '📘 Lecture' : '🧪 Lab'}
+                                <div className="flex items-center justify-between mt-1 md:mt-2 pt-1 border-t border-current/10">
+                                  <span className="font-bold uppercase tracking-tighter text-[7px] md:text-[8px]">
+                                    {event.type === 'lecture' ? '📘' : '🧪'} <span className="hidden md:inline">{event.type === 'lecture' ? 'Lecture' : 'Lab'}</span>
                                   </span>
                                   <button 
                                     onClick={(e) => {
                                       e.stopPropagation();
                                       softDeleteEvent(event.id);
                                     }}
-                                    className="delete-event opacity-60 hover:opacity-100 transition-opacity text-red-500 font-bold uppercase text-[8px] px-2 py-1 hover:bg-red-500/10 rounded"
+                                    className="delete-event opacity-60 hover:opacity-100 transition-opacity text-red-500 font-bold uppercase text-[7px] md:text-[8px] px-1.5 py-0.5 hover:bg-red-500/10 rounded"
                                     data-id={event.id}
                                   >
-                                    Delete
+                                    Del
                                   </button>
                                 </div>
                               </div>
@@ -571,6 +573,41 @@ export default function App() {
           </motion.div>
         </div>
       </main>
+
+      {/* --- Mobile Bottom Navigation --- */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 h-16 glass-panel rounded-none border-t border-white/10 z-40 flex items-center justify-around px-4">
+        <button 
+          onClick={() => setIsAddModalOpen(true)}
+          className="w-12 h-12 bg-indigo-500 text-white rounded-full flex items-center justify-center shadow-lg shadow-indigo-500/20 -translate-y-4"
+        >
+          <Plus className="w-6 h-6" />
+        </button>
+        <button 
+          onClick={() => {
+            if (Notification.permission !== "granted") {
+              Notification.requestPermission().then(p => {
+                if (p === "granted") setNotificationsEnabled(true);
+              });
+            } else {
+              setNotificationsEnabled(!notificationsEnabled);
+            }
+          }}
+          className={cn(
+            "flex flex-col items-center gap-1",
+            notificationsEnabled ? "text-indigo-500" : "opacity-40"
+          )}
+        >
+          <Bell className="w-5 h-5" />
+          <span className="text-[8px] font-bold uppercase">Alerts</span>
+        </button>
+        <button 
+          onClick={() => setIsPrefsOpen(true)}
+          className="flex flex-col items-center gap-1 opacity-40 hover:opacity-100"
+        >
+          <Settings className="w-5 h-5" />
+          <span className="text-[8px] font-bold uppercase">Settings</span>
+        </button>
+      </div>
 
       {/* --- Right Side Panel (Activity & Trash) --- */}
       <AnimatePresence>
@@ -588,7 +625,7 @@ export default function App() {
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="fixed top-0 right-0 bottom-0 w-full max-w-md glass-panel rounded-none border-l border-white/20 z-50 flex flex-col"
+              className="fixed top-0 right-0 bottom-0 w-full md:max-w-md glass-panel rounded-none border-l border-white/20 z-50 flex flex-col"
             >
               <div className="p-6 border-b border-white/10 flex items-center justify-between">
                 <div>
@@ -753,10 +790,10 @@ export default function App() {
               initial={{ scale: 0.9, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.9, opacity: 0, y: 20 }}
-              className="relative w-full max-w-lg glass-panel p-8 space-y-6 shadow-2xl"
+              className="relative w-full max-w-lg glass-panel p-4 md:p-8 space-y-4 md:space-y-6 shadow-2xl overflow-y-auto max-h-[90vh]"
             >
               <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold tracking-tight">Schedule Event</h2>
+                <h2 className="text-xl md:text-2xl font-bold tracking-tight">Schedule Event</h2>
                 <button onClick={() => setIsAddModalOpen(false)} className="p-2 hover:bg-white/10 rounded-full">
                   <X className="w-5 h-5" />
                 </button>
@@ -774,7 +811,7 @@ export default function App() {
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-1.5">
                     <label className="text-[10px] font-bold uppercase tracking-widest opacity-50 ml-1">Faculty</label>
                     <input 
@@ -799,11 +836,11 @@ export default function App() {
 
                 <div className="space-y-1.5">
                   <label className="text-[10px] font-bold uppercase tracking-widest opacity-50 ml-1">Class Type</label>
-                  <div className="flex gap-4 p-1 bg-white/5 rounded-xl border border-white/10">
+                  <div className="flex flex-col md:flex-row gap-2 md:gap-4 p-1 bg-white/5 rounded-xl border border-white/10">
                     <button 
                       onClick={() => setNewEvent({...newEvent, type: 'lecture'})}
                       className={cn(
-                        "flex-1 py-2 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-2",
+                        "flex-1 py-2.5 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-2",
                         newEvent.type === 'lecture' ? "bg-indigo-500 text-white shadow-lg shadow-indigo-500/20" : "opacity-50 hover:opacity-100"
                       )}
                     >
@@ -812,7 +849,7 @@ export default function App() {
                     <button 
                       onClick={() => setNewEvent({...newEvent, type: 'lab'})}
                       className={cn(
-                        "flex-1 py-2 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-2",
+                        "flex-1 py-2.5 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-2",
                         newEvent.type === 'lab' ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/20" : "opacity-50 hover:opacity-100"
                       )}
                     >
@@ -821,14 +858,14 @@ export default function App() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-1.5">
                     <label className="text-[10px] font-bold uppercase tracking-widest opacity-50 ml-1">Start</label>
                     <input 
                       type="time" 
                       value={newEvent.startTime}
                       onChange={e => setNewEvent({...newEvent, startTime: e.target.value})}
-                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none"
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none h-11"
                     />
                   </div>
                   <div className="space-y-1.5">
@@ -837,7 +874,7 @@ export default function App() {
                       type="time" 
                       value={newEvent.endTime}
                       onChange={e => setNewEvent({...newEvent, endTime: e.target.value})}
-                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none"
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none h-11"
                     />
                   </div>
                 </div>
@@ -848,30 +885,33 @@ export default function App() {
                     type="date" 
                     value={newEvent.date}
                     onChange={e => setNewEvent({...newEvent, date: e.target.value})}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none h-11"
                   />
                 </div>
 
                 <div className="space-y-3">
                   <label className="text-[10px] font-bold uppercase tracking-widest opacity-50 ml-1">Multi-Event Repeat (Optional)</label>
                   <div className="flex flex-wrap gap-2">
-                    {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, idx) => (
-                      <button
-                        key={idx}
+                    {[1, 2, 3, 4, 5, 6].map(day => (
+                      <button 
+                        key={day}
                         onClick={() => {
-                          setNewEvent(prev => ({
-                            ...prev,
-                            repeatDays: prev.repeatDays.includes(idx) 
-                              ? prev.repeatDays.filter(d => d !== idx)
-                              : [...prev.repeatDays, idx]
-                          }))
+                          const exists = newEvent.repeatDays.includes(day);
+                          setNewEvent({
+                            ...newEvent,
+                            repeatDays: exists 
+                              ? newEvent.repeatDays.filter(d => d !== day)
+                              : [...newEvent.repeatDays, day]
+                          });
                         }}
                         className={cn(
-                          "w-9 h-9 rounded-lg border border-white/10 text-xs font-bold transition-all",
-                          newEvent.repeatDays.includes(idx) ? "bg-indigo-500 text-white border-indigo-500 shadow-lg shadow-indigo-500/20" : "bg-white/5 opacity-60 hover:opacity-100"
+                          "w-9 h-9 md:w-10 md:h-10 rounded-lg text-[10px] font-bold border transition-all",
+                          newEvent.repeatDays.includes(day) 
+                            ? "bg-indigo-500 border-indigo-500 text-white" 
+                            : "border-white/10 opacity-40 hover:opacity-100"
                         )}
                       >
-                        {day}
+                        {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][day-1]}
                       </button>
                     ))}
                   </div>
@@ -890,21 +930,21 @@ export default function App() {
                     </div>
                   )}
                 </div>
-              </div>
 
-              <div className="pt-4 flex gap-3">
-                <button 
-                  onClick={() => setIsAddModalOpen(false)}
-                  className="flex-1 py-3 px-4 glass hover:bg-white/20 transition-all text-sm font-medium"
-                >
-                  Cancel
-                </button>
-                <button 
-                  onClick={handleAddEvent}
-                  className="flex-[2] py-3 px-4 bg-indigo-500 hover:bg-indigo-600 text-white rounded-xl text-sm font-medium transition-all shadow-lg shadow-indigo-500/20"
-                >
-                  Create Event
-                </button>
+                <div className="pt-4 flex flex-col md:flex-row gap-3">
+                  <button 
+                    onClick={() => setIsAddModalOpen(false)}
+                    className="flex-1 py-3 px-4 glass hover:bg-white/20 transition-all text-sm font-medium h-12"
+                  >
+                    Cancel
+                  </button>
+                  <button 
+                    onClick={handleAddEvent}
+                    className="flex-[2] py-3 px-4 bg-indigo-500 hover:bg-indigo-600 text-white rounded-xl text-sm font-bold transition-all shadow-lg shadow-indigo-500/20 h-12"
+                  >
+                    Create Event
+                  </button>
+                </div>
               </div>
             </motion.div>
           </div>
@@ -926,44 +966,30 @@ export default function App() {
               initial={{ scale: 0.9, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.9, opacity: 0, y: 20 }}
-              className="relative w-full max-w-md glass-panel p-8 space-y-6 shadow-2xl"
+              className="relative w-full max-w-md glass-panel p-6 md:p-8 space-y-6 shadow-2xl"
             >
               <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold tracking-tight">Preferences</h2>
+                <h2 className="text-xl md:text-2xl font-bold tracking-tight">Preferences</h2>
                 <button onClick={() => setIsPrefsOpen(false)} className="p-2 hover:bg-white/10 rounded-full">
                   <X className="w-5 h-5" />
                 </button>
               </div>
 
               <div className="space-y-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-semibold">Dark Mode</p>
-                    <p className="text-[10px] opacity-50">Switch between light and dark themes</p>
-                  </div>
-                  <button 
-                    onClick={() => setIsDarkMode(!isDarkMode)}
-                    className={cn(
-                      "w-12 h-6 rounded-full transition-all relative",
-                      isDarkMode ? "bg-indigo-500" : "bg-white/10"
-                    )}
-                  >
-                    <div className={cn(
-                      "absolute top-1 w-4 h-4 rounded-full bg-white transition-all",
-                      isDarkMode ? "left-7" : "left-1"
-                    )} />
-                  </button>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-semibold">Notifications</p>
-                    <p className="text-[10px] opacity-50">Receive alerts for upcoming classes</p>
+                <div className="flex items-center justify-between p-4 glass rounded-xl">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-500">
+                      <Bell className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold">Notifications</p>
+                      <p className="text-[10px] opacity-50">Alerts for upcoming classes</p>
+                    </div>
                   </div>
                   <button 
                     onClick={() => setNotificationsEnabled(!notificationsEnabled)}
                     className={cn(
-                      "w-12 h-6 rounded-full transition-all relative",
+                      "w-12 h-6 rounded-full p-1 transition-all relative",
                       notificationsEnabled ? "bg-indigo-500" : "bg-white/10"
                     )}
                   >
@@ -974,32 +1000,34 @@ export default function App() {
                   </button>
                 </div>
 
-                <div className="space-y-2">
-                  <p className="text-sm font-semibold">Accent Color</p>
-                  <div className="flex gap-3">
+                <div className="space-y-3">
+                  <label className="text-[10px] font-bold uppercase tracking-widest opacity-50 ml-1">Accent Color</label>
+                  <div className="grid grid-cols-4 gap-3">
                     {['indigo', 'emerald', 'amber', 'rose'].map(color => (
-                      <button
+                      <button 
                         key={color}
                         onClick={() => setAccentColor(color)}
                         className={cn(
-                          "w-8 h-8 rounded-full border-2 transition-all",
-                          accentColor === color ? "border-white scale-110" : "border-transparent opacity-50 hover:opacity-100",
-                          color === 'indigo' ? 'bg-indigo-500' :
-                          color === 'emerald' ? 'bg-emerald-500' :
-                          color === 'amber' ? 'bg-amber-500' : 'bg-rose-500'
+                          "h-12 rounded-xl border-2 transition-all flex items-center justify-center",
+                          accentColor === color ? "border-white" : "border-transparent opacity-40 hover:opacity-100"
                         )}
-                      />
+                        style={{ backgroundColor: color === 'indigo' ? '#6366f1' : color === 'emerald' ? '#10b981' : color === 'amber' ? '#f59e0b' : '#f43f5e' }}
+                      >
+                        {accentColor === color && <div className="w-2 h-2 bg-white rounded-full" />}
+                      </button>
                     ))}
                   </div>
                 </div>
-              </div>
 
-              <button 
-                onClick={() => setIsPrefsOpen(false)}
-                className="w-full py-3 bg-white/10 hover:bg-white/20 rounded-xl text-sm font-bold transition-all"
-              >
-                Done
-              </button>
+                <div className="pt-4 border-t border-white/10">
+                  <button 
+                    onClick={() => setIsPrefsOpen(false)}
+                    className="w-full py-3 bg-white/10 hover:bg-white/20 rounded-xl text-sm font-bold transition-all h-12"
+                  >
+                    Done
+                  </button>
+                </div>
+              </div>
             </motion.div>
           </div>
         )}
