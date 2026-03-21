@@ -11,7 +11,10 @@ import {
   RotateCcw, 
   LayoutDashboard,
   Settings,
-  Bell
+  Bell,
+  Thermometer,
+  Cloud,
+  Droplets
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { format, isWithinInterval, setHours, setMinutes, parseISO, addDays } from 'date-fns';
@@ -65,10 +68,37 @@ const Wallpaper = () => (
 
 const TimeWidget = () => {
   const [now, setNow] = useState(new Date());
+  const [weather, setWeather] = useState<{ temp: number; humidity: number; condition: string } | null>(null);
 
   useEffect(() => {
     const timer = setInterval(() => setNow(new Date()), 60000);
     return () => clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(async (position) => {
+        try {
+          const { latitude, longitude } = position.coords;
+          const response = await fetch(
+            `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,relative_humidity_2m,weather_code`
+          );
+          const data = await response.json();
+          if (data.current) {
+            const temp = data.current.temperature_2m;
+            const humidity = data.current.relative_humidity_2m;
+            let condition = "Normal";
+            if (temp > 30) condition = "Hot";
+            else if (temp < 15) condition = "Cool";
+            else if (humidity > 70) condition = "Humid";
+            
+            setWeather({ temp, humidity, condition });
+          }
+        } catch (error) {
+          console.error("Error fetching weather:", error);
+        }
+      });
+    }
   }, []);
 
   const isWorkingHours = useMemo(() => {
@@ -100,6 +130,21 @@ const TimeWidget = () => {
         <span className="text-[8px] md:text-[10px] opacity-40 uppercase tracking-tighter hidden md:inline">
           {isWorkingHours ? "College Hours" : "Outside Hours"}
         </span>
+        
+        {weather && (
+          <div className="flex items-center gap-2 mt-1 opacity-60">
+            <div className="flex items-center gap-1">
+              <Thermometer className="w-3 h-3" />
+              <span className="text-[10px] font-bold">{Math.round(weather.temp)}°C</span>
+            </div>
+            <div className="flex items-center gap-1">
+              {weather.condition === "Hot" ? <Sun className="w-3 h-3" /> : 
+               weather.condition === "Cool" ? <Cloud className="w-3 h-3" /> : 
+               <Droplets className="w-3 h-3" />}
+              <span className="text-[10px] font-bold uppercase tracking-wider">{weather.condition}</span>
+            </div>
+          </div>
+        )}
       </div>
     </motion.div>
   );
