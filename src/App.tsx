@@ -10,6 +10,7 @@ import {
   Calendar, 
   RotateCcw, 
   LayoutDashboard,
+  Database,
   Settings,
   Bell
 } from 'lucide-react';
@@ -110,11 +111,11 @@ const CircularProgress = ({ value, color, label, icon: Icon }: any) => {
 const NotificationTicker = () => {
   const alerts = [
     "Mechanical Lab starts in 30 minutes",
+    "Exam timetable released",
+    "Assignment deadline tomorrow",
+    "Workshop session rescheduled",
     "New timetable update available",
-    "Exam schedule released",
-    "Final Exam Schedule Released",
     "Library hours extended for finals week",
-    "New research grant opportunities available",
     "Guest lecture on Quantum Computing tomorrow at 2 PM",
     "Campus-wide maintenance scheduled for Sunday"
   ];
@@ -135,34 +136,31 @@ const NotificationTicker = () => {
   );
 };
 
-const TimeWidget = () => {
+const TimeWidget = ({ className }: { className?: string }) => {
   const [now, setNow] = useState(new Date());
 
   useEffect(() => {
-    const timer = setInterval(() => setNow(new Date()), 60000);
+    const timer = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
 
-  const isWorkingHours = useMemo(() => {
-    const start = setMinutes(setHours(now, COLLEGE_START.hour), COLLEGE_START.minute);
-    const end = setMinutes(setHours(now, COLLEGE_END.hour), COLLEGE_END.minute);
-    return isWithinInterval(now, { start, end });
-  }, [now]);
-
   return (
-    <div className="glass-status px-3 py-1.5 flex flex-col items-end transition-all duration-300 hover:bg-white/15 hover:-translate-y-[1px] cursor-default select-none">
-      <div className="flex items-center gap-1.5">
-        <div className={cn(
-          "w-1.5 h-1.5 rounded-full",
-          isWorkingHours ? "bg-emerald-500" : "bg-rose-500"
-        )} />
-        <span className="text-[16px] font-semibold tracking-tight text-white leading-tight">
-          {format(now, 'h:mm a')}
+    <div className={cn("flex flex-col items-center justify-center select-none cursor-default group transition-all duration-500", className)}>
+      <span className="text-cyan-400 font-bold text-[10px] md:text-[11px] uppercase tracking-[0.25em] mb-1 md:mb-2 drop-shadow-[0_0_12px_rgba(34,211,238,0.6)]">
+        {format(now, 'EEE MMM d')}
+      </span>
+      <div className="relative flex items-center justify-center">
+        <span 
+          className="text-4xl md:text-7xl font-black tracking-tighter text-[#0e7490] leading-none"
+          style={{ 
+            fontFamily: '"Outfit", sans-serif',
+            WebkitTextStroke: '1px rgba(255, 255, 255, 0.95)',
+            textShadow: '0 0 40px rgba(14, 116, 144, 0.6)'
+          }}
+        >
+          {format(now, 'h:mm')}
         </span>
       </div>
-      <span className="text-[12px] font-normal text-white/70 leading-tight">
-        {format(now, 'EEE, MMM d')}
-      </span>
     </div>
   );
 };
@@ -192,42 +190,95 @@ export default function App() {
 
   const [events, setEvents] = useState<Event[]>(() => {
     const saved = localStorage.getItem('events');
-    if (saved) return JSON.parse(saved);
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (parsed.length > 0) return parsed;
+    }
     
-    // Realistic Test Data
+    // Realistic Test Data (Fallback if empty)
     const baseDate = new Date(2026, 2, 29); // Sunday March 29
     const getDayDate = (offset: number) => format(addDays(baseDate, offset), 'yyyy-MM-dd');
     
     return [
-      { id: '1', subject: 'Thermodynamics', faculty: 'Dr. Smith', room: 'L-101', type: 'lecture', startTime: '10:00', endTime: '11:00', date: getDayDate(2) },
-      { id: '2', subject: 'Mechanical Lab', faculty: 'Prof. Johnson', room: 'Lab-A', type: 'lab', startTime: '12:00', endTime: '14:00', date: getDayDate(3) },
-      { id: '3', subject: 'Fluid Mechanics', faculty: 'Dr. Brown', room: 'L-202', type: 'lecture', startTime: '09:00', endTime: '10:00', date: getDayDate(4) },
-      { id: '4', subject: 'Workshop Practice', faculty: 'Mr. Wilson', room: 'Workshop', type: 'lab', startTime: '14:00', endTime: '16:00', date: getDayDate(5) },
-      { id: '5', subject: 'Mathematics', faculty: 'Dr. Lee', room: 'L-303', type: 'lecture', startTime: '11:00', endTime: '12:00', date: getDayDate(6) },
-      { id: '6', subject: 'Heat Transfer', faculty: 'Dr. Smith', room: 'L-101', type: 'lecture', startTime: '14:00', endTime: '15:00', date: getDayDate(2) },
-      { id: '7', subject: 'CAD Lab', faculty: 'Prof. Garcia', room: 'Comp-Lab', type: 'lab', startTime: '11:00', endTime: '13:00', date: getDayDate(4) },
-      { id: '8', subject: 'Dynamics of Machines', faculty: 'Dr. Brown', room: 'L-202', type: 'lecture', startTime: '09:00', endTime: '10:00', date: getDayDate(3) },
-      { id: '9', subject: 'Engineering Ethics', faculty: 'Prof. Davis', room: 'L-404', type: 'lecture', startTime: '10:00', endTime: '11:00', date: getDayDate(5) },
-      { id: '10', subject: 'Project Work', faculty: 'Dr. Lee', room: 'Project-Room', type: 'lab', startTime: '14:00', endTime: '17:00', date: getDayDate(6) },
-      { id: '11', subject: 'Material Science', faculty: 'Dr. Smith', room: 'L-101', type: 'lecture', startTime: '11:00', endTime: '12:00', date: getDayDate(2) },
-      { id: '12', subject: 'Strength of Materials', faculty: 'Prof. Johnson', room: 'L-202', type: 'lecture', startTime: '11:00', endTime: '12:00', date: getDayDate(3) },
+      // Tuesday
+      { id: '1', subject: 'Engineering Mathematics', faculty: 'Dr. Kulkarni', room: 'A101', type: 'lecture', startTime: '09:00', endTime: '10:00', date: getDayDate(2) },
+      { id: '2', subject: 'Thermodynamics', faculty: 'Prof. Patil', room: 'A102', type: 'lecture', startTime: '10:00', endTime: '11:00', date: getDayDate(2) },
+      { id: '3', subject: 'Fluid Mechanics', faculty: 'Dr. Deshmukh', room: 'A103', type: 'lecture', startTime: '11:00', endTime: '12:00', date: getDayDate(2) },
+      { id: '4', subject: 'Mechanical Lab', faculty: 'Prof. Jadhav', room: 'Lab 1', type: 'lab', startTime: '13:00', endTime: '15:00', date: getDayDate(2) },
+      { id: '17', subject: 'Material Science', faculty: 'Dr. Smith', room: 'L-101', type: 'lecture', startTime: '15:00', endTime: '16:00', date: getDayDate(2) },
+      
+      // Wednesday
+      { id: '5', subject: 'Machine Drawing', faculty: 'Prof. Shinde', room: 'B201', type: 'lecture', startTime: '09:00', endTime: '10:00', date: getDayDate(3) },
+      { id: '6', subject: 'Workshop Practice', faculty: 'Prof. Mane', room: 'Workshop', type: 'lab', startTime: '10:00', endTime: '12:00', date: getDayDate(3) },
+      { id: '7', subject: 'Strength of Materials', faculty: 'Dr. Sawant', room: 'B202', type: 'lecture', startTime: '13:00', endTime: '14:00', date: getDayDate(3) },
+      { id: '8', subject: 'Computer Aided Design', faculty: 'Prof. Patil', room: 'CAD Lab', type: 'lab', startTime: '14:00', endTime: '16:00', date: getDayDate(3) },
+      { id: '18', subject: 'Dynamics of Machines', faculty: 'Dr. Brown', room: 'L-202', type: 'lecture', startTime: '16:00', endTime: '17:00', date: getDayDate(3) },
+      
+      // Thursday
+      { id: '9', subject: 'Engineering Physics', faculty: 'Dr. More', room: 'C101', type: 'lecture', startTime: '09:00', endTime: '10:00', date: getDayDate(4) },
+      { id: '10', subject: 'Electrical Engineering', faculty: 'Prof. Kadam', room: 'C102', type: 'lecture', startTime: '10:00', endTime: '11:00', date: getDayDate(4) },
+      { id: '11', subject: 'Electronics Lab', faculty: 'Prof. Pawar', room: 'Electronics Lab', type: 'lab', startTime: '11:00', endTime: '14:00', date: getDayDate(4) },
+      { id: '19', subject: 'Control Systems', faculty: 'Dr. Gupta', room: 'C103', type: 'lecture', startTime: '14:00', endTime: '15:00', date: getDayDate(4) },
+      { id: '20', subject: 'Microprocessors', faculty: 'Prof. Joshi', room: 'C104', type: 'lecture', startTime: '15:00', endTime: '16:00', date: getDayDate(4) },
+      
+      // Friday
+      { id: '12', subject: 'Fluid Mechanics Lab', faculty: 'Dr. Deshmukh', room: 'Lab 2', type: 'lab', startTime: '09:00', endTime: '11:00', date: getDayDate(5) },
+      { id: '13', subject: 'Mathematics II', faculty: 'Dr. Kulkarni', room: 'A101', type: 'lecture', startTime: '11:00', endTime: '12:00', date: getDayDate(5) },
+      { id: '14', subject: 'Thermodynamics Lab', faculty: 'Prof. Patil', room: 'Lab 3', type: 'lab', startTime: '13:00', endTime: '15:00', date: getDayDate(5) },
+      { id: '21', subject: 'Heat Transfer', faculty: 'Dr. Smith', room: 'L-101', type: 'lecture', startTime: '15:00', endTime: '16:00', date: getDayDate(5) },
+      { id: '22', subject: 'Industrial Engineering', faculty: 'Prof. Shah', room: 'L-102', type: 'lecture', startTime: '16:00', endTime: '17:00', date: getDayDate(5) },
+      
+      // Saturday
+      { id: '15', subject: 'Engineering Graphics', faculty: 'Prof. Shinde', room: 'Drawing Hall', type: 'lab', startTime: '09:00', endTime: '11:00', date: getDayDate(6) },
+      { id: '16', subject: 'Environmental Studies', faculty: 'Dr. Joshi', room: 'C201', type: 'lecture', startTime: '11:00', endTime: '12:00', date: getDayDate(6) },
+      { id: '23', subject: 'Project Work', faculty: 'Dr. Lee', room: 'Project Room', type: 'lab', startTime: '13:00', endTime: '16:00', date: getDayDate(6) },
+      { id: '24', subject: 'Soft Skills', faculty: 'Ms. Kapoor', room: 'Seminar Hall', type: 'lecture', startTime: '16:00', endTime: '17:00', date: getDayDate(6) },
+
+      // Extra entries to reach ~30
+      { id: '25', subject: 'Automobile Engineering', faculty: 'Dr. Rao', room: 'A201', type: 'lecture', startTime: '09:00', endTime: '10:00', date: getDayDate(2) },
+      { id: '26', subject: 'Vibrations Lab', faculty: 'Prof. Kulkarni', room: 'Vib Lab', type: 'lab', startTime: '14:00', endTime: '16:00', date: getDayDate(4) },
+      { id: '27', subject: 'Mechatronics', faculty: 'Dr. Singh', room: 'B101', type: 'lecture', startTime: '11:00', endTime: '12:00', date: getDayDate(3) },
+      { id: '28', subject: 'Power Plant Eng.', faculty: 'Prof. Reddy', room: 'B102', type: 'lecture', startTime: '15:00', endTime: '16:00', date: getDayDate(3) },
+      { id: '29', subject: 'Refrigeration', faculty: 'Dr. Verma', room: 'C202', type: 'lecture', startTime: '10:00', endTime: '11:00', date: getDayDate(6) },
+      { id: '30', subject: 'Metrology Lab', faculty: 'Prof. Nair', room: 'Met Lab', type: 'lab', startTime: '11:00', endTime: '13:00', date: getDayDate(5) },
+
+      // Trash Data (5 entries)
+      { id: 't1', subject: 'Old Mathematics', faculty: 'Dr. Kulkarni', room: 'A101', type: 'lecture', startTime: '08:00', endTime: '09:00', date: getDayDate(2), isDeleted: true },
+      { id: 't2', subject: 'Cancelled Lab', faculty: 'Prof. Patil', room: 'Lab 1', type: 'lab', startTime: '15:00', endTime: '17:00', date: getDayDate(2), isDeleted: true },
+      { id: 't3', subject: 'Guest Lecture', faculty: 'Dr. Strange', room: 'Auditorium', type: 'lecture', startTime: '14:00', endTime: '15:00', date: getDayDate(3), isDeleted: true },
+      { id: 't4', subject: 'Extra Workshop', faculty: 'Mr. Stark', room: 'Workshop', type: 'lab', startTime: '08:00', endTime: '10:00', date: getDayDate(4), isDeleted: true },
+      { id: 't5', subject: 'Seminar', faculty: 'Prof. Banner', room: 'Seminar Hall', type: 'lecture', startTime: '16:00', endTime: '17:00', date: getDayDate(5), isDeleted: true },
     ];
   });
 
   const [activities, setActivities] = useState<ActivityLog[]>(() => {
     const saved = localStorage.getItem('activities');
-    if (saved) return JSON.parse(saved).map((a: any) => ({ ...a, timestamp: new Date(a.timestamp) }));
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (parsed.length > 0) return parsed.map((a: any) => ({ ...a, timestamp: new Date(a.timestamp) }));
+    }
     
     return [
-      { id: 'a1', type: 'added', description: 'Added Thermodynamics class', timestamp: new Date(Date.now() - 1000 * 60 * 10), itemId: '1' },
-      { id: 'a2', type: 'edited', description: 'Updated Mechanical Lab timing', timestamp: new Date(Date.now() - 1000 * 60 * 45), itemId: '2' },
-      { id: 'a3', type: 'deleted', description: 'Deleted Mathematics lecture', timestamp: new Date(Date.now() - 1000 * 60 * 120), itemId: '5' },
-      { id: 'a4', type: 'restored', description: 'Restored Fluid Mechanics event', timestamp: new Date(Date.now() - 1000 * 60 * 300), itemId: '3' },
+      { id: 'a1', type: 'added', description: 'Added Engineering Mathematics lecture', timestamp: new Date(Date.now() - 1000 * 60 * 5), itemId: '1' },
+      { id: 'a2', type: 'added', description: 'Added Thermodynamics lecture', timestamp: new Date(Date.now() - 1000 * 60 * 15), itemId: '2' },
+      { id: 'a3', type: 'edited', description: 'Updated Mechanical Lab timing', timestamp: new Date(Date.now() - 1000 * 60 * 45), itemId: '4' },
+      { id: 'a4', type: 'deleted', description: 'Deleted Old Mathematics lecture', timestamp: new Date(Date.now() - 1000 * 60 * 120), itemId: 't1' },
+      { id: 'a5', type: 'restored', description: 'Restored Fluid Mechanics event', timestamp: new Date(Date.now() - 1000 * 60 * 300), itemId: '3' },
+      { id: 'a6', type: 'added', description: 'Added Workshop Practice lab', timestamp: new Date(Date.now() - 1000 * 60 * 400), itemId: '6' },
+      { id: 'a7', type: 'edited', description: 'Changed room for Engineering Physics', timestamp: new Date(Date.now() - 1000 * 60 * 600), itemId: '9' },
+      { id: 'a8', type: 'added', description: 'Added Electrical Engineering lecture', timestamp: new Date(Date.now() - 1000 * 60 * 800), itemId: '10' },
+      { id: 'a9', type: 'deleted', description: 'Cancelled extra workshop session', timestamp: new Date(Date.now() - 1000 * 60 * 1000), itemId: 't4' },
+      { id: 'a10', type: 'added', description: 'Added Project Work session', timestamp: new Date(Date.now() - 1000 * 60 * 1200), itemId: '23' },
+      { id: 'a11', type: 'edited', description: 'Updated faculty for Soft Skills', timestamp: new Date(Date.now() - 1000 * 60 * 1400), itemId: '24' },
+      { id: 'a12', type: 'added', description: 'Added Automobile Engineering', timestamp: new Date(Date.now() - 1000 * 60 * 1600), itemId: '25' },
+      { id: 'a13', type: 'restored', description: 'Restored Strength of Materials', timestamp: new Date(Date.now() - 1000 * 60 * 1800), itemId: '7' },
+      { id: 'a14', type: 'added', description: 'Added Mechatronics lecture', timestamp: new Date(Date.now() - 1000 * 60 * 2000), itemId: '27' },
+      { id: 'a15', type: 'edited', description: 'Updated CAD Lab duration', timestamp: new Date(Date.now() - 1000 * 60 * 2200), itemId: '8' },
     ];
   });
 
   const [isPanelOpen, setIsPanelOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<'activity' | 'trash'>('activity');
+  const [activeTab, setActiveTab] = useState<'activity' | 'trash' | 'raw'>('activity');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
 
@@ -460,7 +511,7 @@ export default function App() {
         </div>
 
         <div className="flex items-center gap-2 md:gap-4">
-          <TimeWidget />
+          <TimeWidget className="lg:hidden scale-75 origin-right" />
           
           <button 
             onClick={() => setIsDarkMode(!isDarkMode)}
@@ -488,8 +539,12 @@ export default function App() {
           <motion.div 
             initial={{ x: -20, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
-            className="glass-panel bg-black/20 p-6 space-y-8 h-full"
+            className="glass-panel bg-black/20 p-6 space-y-8 h-full overflow-y-auto custom-scrollbar"
           >
+            <div className="flex flex-col items-center gap-4 mb-2">
+              <TimeWidget />
+              <div className="w-full h-[1px] bg-white/10" />
+            </div>
             <div className="flex justify-around items-center py-4 border-b border-white/10">
               <CircularProgress 
                 value={Math.min(100, Math.max(0, Math.round(((new Date().getHours() * 60 + new Date().getMinutes()) - (9 * 60)) / (8 * 60) * 100)))} 
@@ -531,6 +586,7 @@ export default function App() {
                     }
                   }},
                   { icon: Settings, label: 'Preferences', onClick: () => setIsPrefsOpen(true) },
+                  { icon: Database, label: 'Raw Data', onClick: () => { setIsPanelOpen(true); setActiveTab('raw'); } },
                 ].map((item) => (
                   <button 
                     key={item.label}
@@ -620,12 +676,19 @@ export default function App() {
                 <div className="grid grid-cols-[80px_repeat(5,1fr)] md:grid-cols-[100px_repeat(5,1fr)] border border-white/10 rounded-xl overflow-hidden glass">
                   {/* Header */}
                   <div className="bg-white/5 p-2 md:p-4 border-b border-r border-white/10 font-bold text-[8px] md:text-[10px] uppercase opacity-50">Time</div>
-                  {['Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map(day => (
-                    <div key={day} className="bg-white/5 p-2 md:p-4 border-b border-r border-white/10 font-bold text-[8px] md:text-[10px] uppercase opacity-50 text-center">
-                      <span className="hidden md:inline">{day}</span>
-                      <span className="md:hidden">{day.substring(0, 3)}</span>
-                    </div>
-                  ))}
+                  {['Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map(day => {
+                    const isToday = format(new Date(), 'EEEE') === day;
+                    return (
+                      <div key={day} className={cn(
+                        "bg-white/5 p-2 md:p-4 border-b border-r border-white/10 font-bold text-[8px] md:text-[10px] uppercase opacity-50 text-center relative",
+                        isToday && "opacity-100 text-cyan-400"
+                      )}>
+                        {isToday && <div className="absolute top-0 left-0 right-0 h-[2px] bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.8)]" />}
+                        <span className="hidden md:inline">{day}</span>
+                        <span className="md:hidden">{day.substring(0, 3)}</span>
+                      </div>
+                    );
+                  })}
                   
                   {/* Rows */}
                   {Array.from({ length: 9 }, (_, i) => i + 9).map(hour => (
@@ -761,28 +824,48 @@ export default function App() {
               </div>
 
               <div className="flex p-2 gap-1 border-b border-white/5">
-                <button 
-                  onClick={() => setActiveTab('activity')}
-                  className={cn(
-                    "flex-1 py-2 text-xs font-semibold rounded-lg transition-all",
-                    activeTab === 'activity' ? "bg-white/10 text-indigo-500" : "opacity-40 hover:opacity-100"
-                  )}
-                >
-                  Activity
-                </button>
-                <button 
-                  onClick={() => setActiveTab('trash')}
-                  className={cn(
-                    "flex-1 py-2 text-xs font-semibold rounded-lg transition-all",
-                    activeTab === 'trash' ? "bg-white/10 text-indigo-500" : "opacity-40 hover:opacity-100"
-                  )}
-                >
-                  Trash ({trashEvents.length})
-                </button>
+                {[
+                  { id: 'activity', label: 'Activity' },
+                  { id: 'trash', label: `Trash (${trashEvents.length})` },
+                  { id: 'raw', label: 'Raw Data' }
+                ].map(tab => (
+                  <button 
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id as any)}
+                    className={cn(
+                      "flex-1 py-2 text-[10px] font-bold uppercase tracking-wider rounded-lg transition-all",
+                      activeTab === tab.id ? "bg-white/10 text-indigo-500" : "opacity-40 hover:opacity-100"
+                    )}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
               </div>
 
               <div className="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar">
-                {activeTab === 'activity' ? (
+                {activeTab === 'raw' ? (
+                  <div className="h-full flex flex-col space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-xs font-bold uppercase tracking-widest opacity-50">JSON Payload</h3>
+                      <button 
+                        onClick={() => {
+                          const blob = new Blob([JSON.stringify({ events, activities }, null, 2)], { type: 'application/json' });
+                          const url = URL.createObjectURL(blob);
+                          const a = document.createElement('a');
+                          a.href = url;
+                          a.download = 'timetable-data.json';
+                          a.click();
+                        }}
+                        className="text-[10px] font-bold text-indigo-500 hover:underline"
+                      >
+                        Download
+                      </button>
+                    </div>
+                    <pre className="flex-1 bg-black/40 p-4 rounded-xl text-[10px] font-mono overflow-auto border border-white/10 text-emerald-400/80">
+                      {JSON.stringify({ events, activities }, null, 2)}
+                    </pre>
+                  </div>
+                ) : activeTab === 'activity' ? (
                   activities.length === 0 ? (
                     <div className="h-full flex flex-col items-center justify-center opacity-20 space-y-2">
                       <History className="w-8 h-8" />
@@ -1139,7 +1222,16 @@ export default function App() {
                   </div>
                 </div>
 
-                <div className="pt-4 border-t border-white/10">
+                <div className="pt-4 border-t border-white/10 space-y-3">
+                  <button 
+                    onClick={() => {
+                      localStorage.clear();
+                      window.location.reload();
+                    }}
+                    className="w-full py-3 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-xl text-xs font-bold uppercase tracking-widest transition-all border border-red-500/20"
+                  >
+                    Reset All Data
+                  </button>
                   <button 
                     onClick={() => setIsPrefsOpen(false)}
                     className="w-full py-3 bg-white/10 hover:bg-white/20 rounded-xl text-sm font-bold transition-all h-12"
