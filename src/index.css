@@ -38,6 +38,11 @@
   }
 }
 
+@utility glass-status {
+  @apply backdrop-blur-md bg-white/10 border border-white/20 shadow-sm rounded-[18px];
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1), inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
 @utility animate-marquee {
   animation: marquee 30s linear infinite;
 }
