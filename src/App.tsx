@@ -12,7 +12,13 @@ import {
   LayoutDashboard,
   Database,
   Settings,
-  Bell
+  Bell,
+  BookOpen,
+  FlaskConical,
+  Edit2,
+  MousePointer2,
+  ChevronRight,
+  Sliders
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { format, isWithinInterval, setHours, setMinutes, parseISO, addDays } from 'date-fns';
@@ -146,16 +152,17 @@ const TimeWidget = ({ className }: { className?: string }) => {
 
   return (
     <div className={cn("flex flex-col items-center justify-center select-none cursor-default group transition-all duration-500", className)}>
-      <span className="text-cyan-400 font-bold text-[10px] md:text-[11px] uppercase tracking-[0.25em] mb-1 md:mb-2 drop-shadow-[0_0_12px_rgba(34,211,238,0.6)]">
-        {format(now, 'EEE MMM d')}
+      <span className="text-cyan-400 font-bold text-[10px] md:text-[11px] uppercase tracking-[0.3em] mb-1 md:mb-2 drop-shadow-[0_0_15px_rgba(34,211,238,0.8)]">
+        {format(now, 'EEEE, MMM d')}
       </span>
       <div className="relative flex items-center justify-center">
+        <div className="absolute inset-0 bg-cyan-500/10 blur-3xl rounded-full scale-150 opacity-50 group-hover:opacity-100 transition-opacity duration-1000" />
         <span 
-          className="text-4xl md:text-7xl font-black tracking-tighter text-[#0e7490] leading-none"
+          className="text-5xl md:text-8xl font-black tracking-tighter text-[#0e7490] leading-none relative z-10"
           style={{ 
             fontFamily: '"Outfit", sans-serif',
-            WebkitTextStroke: '1px rgba(255, 255, 255, 0.95)',
-            textShadow: '0 0 40px rgba(14, 116, 144, 0.6)'
+            WebkitTextStroke: '1.5px rgba(255, 255, 255, 0.98)',
+            textShadow: '0 0 60px rgba(14, 116, 144, 0.8), 0 0 20px rgba(255, 255, 255, 0.2)'
           }}
         >
           {format(now, 'h:mm')}
@@ -280,6 +287,7 @@ export default function App() {
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'activity' | 'trash' | 'raw'>('activity');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
 
   // Form State
@@ -533,13 +541,13 @@ export default function App() {
       </header>
 
       {/* --- Main Content --- */}
-      <main className="pt-20 md:pt-28 pb-20 md:pb-12 px-4 md:px-8 max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8 h-screen md:h-[calc(100vh-2rem)]">
+      <main className="pt-20 md:pt-28 pb-20 md:pb-12 px-4 md:px-8 max-w-[1600px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8 h-screen md:h-[calc(100vh-2rem)]">
         {/* Left Sidebar / Controls - Hidden on mobile, replaced by bottom nav */}
-        <div className="hidden lg:block lg:col-span-3 space-y-6">
+        <div className="hidden lg:block lg:col-span-2 space-y-6">
           <motion.div 
             initial={{ x: -20, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
-            className="glass-panel bg-black/20 p-6 space-y-8 h-full overflow-y-auto custom-scrollbar"
+            className="glass-panel bg-black/20 p-6 space-y-8 h-full overflow-y-auto custom-scrollbar rounded-[24px]"
           >
             <div className="flex flex-col items-center gap-4 mb-2">
               <TimeWidget />
@@ -612,11 +620,11 @@ export default function App() {
         </div>
 
         {/* Center Content */}
-        <div className="lg:col-span-9 overflow-hidden flex flex-col gap-4 md:gap-6">
+        <div className="lg:col-span-7 overflow-hidden flex flex-col gap-4 md:gap-6">
           <motion.div 
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            className="glass-panel bg-white/[0.03] flex-1 overflow-hidden flex flex-col shadow-2xl"
+            className="glass-panel bg-white/[0.03] flex-1 overflow-hidden flex flex-col shadow-2xl rounded-[24px]"
           >
             <div className="p-4 md:p-6 border-b border-white/10 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white/[0.02]">
               <div>
@@ -716,11 +724,16 @@ export default function App() {
                           >
                             <div className="absolute inset-0 opacity-0 group-hover/cell:opacity-100 transition-opacity pointer-events-none bg-gradient-to-br from-cyan-500/5 to-transparent" />
                             {dayEvents.map(event => (
-                              <div key={event.id} className={cn(
-                                "p-1.5 md:p-2 rounded-lg text-[8px] md:text-[10px] font-medium mb-1 shadow-md border animate-in fade-in zoom-in-95 duration-300 relative z-10",
-                                event.type === 'lecture' ? 'bg-blue-600/20 text-blue-300 border-blue-500/40' :
-                                'bg-emerald-600/20 text-emerald-300 border-emerald-500/40'
-                              )}>
+                              <div 
+                                key={event.id} 
+                                onClick={() => setSelectedEvent(event)}
+                                className={cn(
+                                  "p-1.5 md:p-2 rounded-xl text-[8px] md:text-[10px] font-medium mb-1 shadow-md border animate-in fade-in zoom-in-95 duration-300 relative z-10 cursor-pointer transition-all active:scale-95",
+                                  selectedEvent?.id === event.id ? "ring-2 ring-cyan-400 ring-offset-2 ring-offset-black/20" : "",
+                                  event.type === 'lecture' ? 'bg-blue-600/20 text-blue-300 border-blue-500/40 hover:bg-blue-600/30' :
+                                  'bg-emerald-600/20 text-emerald-300 border-emerald-500/40 hover:bg-emerald-600/30'
+                                )}
+                              >
                                 <div className="font-bold truncate text-xs md:text-sm mb-0.5 text-white">{event.subject}</div>
                                 <div className="opacity-90 flex items-center gap-1 mb-0.5 truncate text-white/80">
                                   <span className="opacity-50 hidden md:inline">Prof.</span> {event.faculty}
@@ -750,6 +763,143 @@ export default function App() {
                       })}
                     </React.Fragment>
                   ))}
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+
+        {/* Right Panel - Properties / Controls */}
+        <div className="hidden lg:block lg:col-span-3 space-y-6">
+          <motion.div 
+            initial={{ x: 20, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            className="glass-panel bg-black/20 p-6 space-y-8 h-full overflow-y-auto custom-scrollbar rounded-[24px]"
+          >
+            <div className="space-y-6">
+              <div className="flex items-center justify-between">
+                <h2 className="text-sm font-semibold opacity-60 uppercase tracking-widest">Properties</h2>
+                <div className="flex gap-2">
+                  <div className="w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.6)]" />
+                  <div className="w-2 h-2 rounded-full bg-white/10" />
+                </div>
+              </div>
+
+              {selectedEvent ? (
+                <motion.div 
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="space-y-6"
+                >
+                  <div className="glass-card p-4 space-y-4">
+                    <div className="flex items-center gap-3">
+                      <div className={cn(
+                        "w-10 h-10 rounded-xl flex items-center justify-center",
+                        selectedEvent.type === 'lecture' ? "bg-blue-500/20 text-blue-400" : "bg-emerald-500/20 text-emerald-400"
+                      )}>
+                        {selectedEvent.type === 'lecture' ? <BookOpen className="w-5 h-5" /> : <FlaskConical className="w-5 h-5" />}
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-white leading-tight">{selectedEvent.subject}</h3>
+                        <p className="text-[10px] opacity-50 uppercase tracking-widest">{selectedEvent.type}</p>
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-3 pt-4 border-t border-white/10">
+                      <div className="flex justify-between items-center">
+                        <span className="text-[10px] opacity-40 uppercase font-bold tracking-widest">Time</span>
+                        <span className="text-xs font-medium text-white/80">{selectedEvent.startTime} - {selectedEvent.endTime}</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-[10px] opacity-40 uppercase font-bold tracking-widest">Room</span>
+                        <span className="text-xs font-medium text-white/80">{selectedEvent.room}</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-[10px] opacity-40 uppercase font-bold tracking-widest">Instructor</span>
+                        <span className="text-xs font-medium text-white/80">{selectedEvent.faculty}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <h3 className="text-[10px] font-bold opacity-40 uppercase tracking-widest">Quick Actions</h3>
+                    <div className="grid grid-cols-2 gap-3">
+                      <button className="glass-button secondary text-xs py-2.5">
+                        <Edit2 className="w-3 h-3" />
+                        Edit
+                      </button>
+                      <button 
+                        onClick={() => softDeleteEvent(selectedEvent.id)}
+                        className="glass-button secondary text-xs py-2.5 text-rose-400 hover:bg-rose-500/10 hover:border-rose-500/20"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="pt-4 border-t border-white/10 space-y-4">
+                    <h3 className="text-[10px] font-bold opacity-40 uppercase tracking-widest">Liquid Glass Controls</h3>
+                    
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-medium text-white/70">Opacity</span>
+                        <div className="flex items-center gap-3">
+                          <div className="w-24 h-1 bg-white/10 rounded-full overflow-hidden">
+                            <div className="w-full h-full bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.6)]" />
+                          </div>
+                          <span className="text-[10px] font-mono opacity-50">100%</span>
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-medium text-white/70">Blur</span>
+                        <div className="flex items-center gap-3">
+                          <div className="w-24 h-1 bg-white/10 rounded-full overflow-hidden">
+                            <div className="w-[21.8%] h-full bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.6)]" />
+                          </div>
+                          <span className="text-[10px] font-mono opacity-50">21.8%</span>
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-medium text-white/70">Specular</span>
+                        <div className="w-8 h-4 bg-cyan-500 rounded-full relative">
+                          <div className="absolute right-1 top-1 w-2 h-2 bg-white rounded-full" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              ) : (
+                <div className="h-64 flex flex-col items-center justify-center text-center space-y-4 opacity-30">
+                  <div className="w-16 h-16 rounded-full border-2 border-dashed border-white/20 flex items-center justify-center">
+                    <MousePointer2 className="w-8 h-8" />
+                  </div>
+                  <p className="text-xs font-medium">Select an event to view properties</p>
+                </div>
+              )}
+
+              <div className="pt-8 border-t border-white/10 space-y-6">
+                <h2 className="text-sm font-semibold opacity-60 uppercase tracking-widest">Display Settings</h2>
+                
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-medium text-white/70">Glass Blur</span>
+                    <div className="flex items-center gap-3">
+                      <div className="w-24 h-1 bg-white/10 rounded-full overflow-hidden">
+                        <div className="w-3/4 h-full bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.6)]" />
+                      </div>
+                      <span className="text-[10px] font-mono opacity-50">75%</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-medium text-white/70">Translucency</span>
+                    <div className="flex items-center gap-3">
+                      <div className="w-24 h-1 bg-white/10 rounded-full overflow-hidden">
+                        <div className="w-1/2 h-full bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.6)]" />
+                      </div>
+                      <span className="text-[10px] font-mono opacity-50">50%</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
