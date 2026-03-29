@@ -59,7 +59,6 @@ const GlassCard = ({ children, className, ...props }: any) => (
 const Wallpaper = () => (
   <>
     <div className="mesh-gradient" />
-    <div className="hexagon-overlay" />
   </>
 );
 
@@ -89,19 +88,20 @@ const CircularProgress = ({ value, color, label, icon: Icon }: any) => {
             stroke={color}
             strokeWidth="8"
             strokeDasharray={circumference}
+            strokeLinecap="round"
             initial={{ strokeDashoffset: circumference }}
             animate={{ strokeDashoffset: offset }}
             transition={{ duration: 1.5, ease: "easeOut" }}
-            style={{ filter: `drop-shadow(0 0 8px ${color})` }}
+            style={{ filter: `drop-shadow(0 0 12px ${color})` }}
           />
         </svg>
         <div className="absolute inset-0 flex items-center justify-center">
-          <Icon className="w-6 h-6" style={{ color }} />
+          <Icon className="w-6 h-6 drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]" style={{ color }} />
         </div>
       </div>
       <div className="text-center">
-        <p className="text-[10px] uppercase tracking-widest opacity-60 font-medium">{label}</p>
-        <p className="text-sm font-bold tracking-tight">{value}%</p>
+        <p className="text-[10px] uppercase tracking-widest opacity-80 font-bold text-white/70">{label}</p>
+        <p className="text-sm font-black tracking-tight text-white">{value}%</p>
       </div>
     </div>
   );
@@ -109,6 +109,9 @@ const CircularProgress = ({ value, color, label, icon: Icon }: any) => {
 
 const NotificationTicker = () => {
   const alerts = [
+    "Mechanical Lab starts in 30 minutes",
+    "New timetable update available",
+    "Exam schedule released",
     "Final Exam Schedule Released",
     "Library hours extended for finals week",
     "New research grant opportunities available",
@@ -117,12 +120,12 @@ const NotificationTicker = () => {
   ];
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 h-10 glass border-t-0 rounded-none flex items-center z-50">
+    <div className="fixed bottom-0 left-0 right-0 h-10 glass-panel border-t border-white/10 rounded-none flex items-center z-50 bg-black/40 backdrop-blur-xl">
       <div className="marquee">
         <div className="marquee-content gap-12 px-12">
           {[...alerts, ...alerts].map((alert, i) => (
-            <div key={i} className="flex items-center gap-3 text-xs font-medium tracking-wide">
-              <div className="w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.8)]" />
+            <div key={i} className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-widest text-white/80">
+              <div className="w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_10px_rgba(34,211,238,1)]" />
               {alert}
             </div>
           ))}
@@ -189,12 +192,38 @@ export default function App() {
 
   const [events, setEvents] = useState<Event[]>(() => {
     const saved = localStorage.getItem('events');
-    return saved ? JSON.parse(saved) : [];
+    if (saved) return JSON.parse(saved);
+    
+    // Realistic Test Data
+    const baseDate = new Date(2026, 2, 29); // Sunday March 29
+    const getDayDate = (offset: number) => format(addDays(baseDate, offset), 'yyyy-MM-dd');
+    
+    return [
+      { id: '1', subject: 'Thermodynamics', faculty: 'Dr. Smith', room: 'L-101', type: 'lecture', startTime: '10:00', endTime: '11:00', date: getDayDate(2) },
+      { id: '2', subject: 'Mechanical Lab', faculty: 'Prof. Johnson', room: 'Lab-A', type: 'lab', startTime: '12:00', endTime: '14:00', date: getDayDate(3) },
+      { id: '3', subject: 'Fluid Mechanics', faculty: 'Dr. Brown', room: 'L-202', type: 'lecture', startTime: '09:00', endTime: '10:00', date: getDayDate(4) },
+      { id: '4', subject: 'Workshop Practice', faculty: 'Mr. Wilson', room: 'Workshop', type: 'lab', startTime: '14:00', endTime: '16:00', date: getDayDate(5) },
+      { id: '5', subject: 'Mathematics', faculty: 'Dr. Lee', room: 'L-303', type: 'lecture', startTime: '11:00', endTime: '12:00', date: getDayDate(6) },
+      { id: '6', subject: 'Heat Transfer', faculty: 'Dr. Smith', room: 'L-101', type: 'lecture', startTime: '14:00', endTime: '15:00', date: getDayDate(2) },
+      { id: '7', subject: 'CAD Lab', faculty: 'Prof. Garcia', room: 'Comp-Lab', type: 'lab', startTime: '11:00', endTime: '13:00', date: getDayDate(4) },
+      { id: '8', subject: 'Dynamics of Machines', faculty: 'Dr. Brown', room: 'L-202', type: 'lecture', startTime: '09:00', endTime: '10:00', date: getDayDate(3) },
+      { id: '9', subject: 'Engineering Ethics', faculty: 'Prof. Davis', room: 'L-404', type: 'lecture', startTime: '10:00', endTime: '11:00', date: getDayDate(5) },
+      { id: '10', subject: 'Project Work', faculty: 'Dr. Lee', room: 'Project-Room', type: 'lab', startTime: '14:00', endTime: '17:00', date: getDayDate(6) },
+      { id: '11', subject: 'Material Science', faculty: 'Dr. Smith', room: 'L-101', type: 'lecture', startTime: '11:00', endTime: '12:00', date: getDayDate(2) },
+      { id: '12', subject: 'Strength of Materials', faculty: 'Prof. Johnson', room: 'L-202', type: 'lecture', startTime: '11:00', endTime: '12:00', date: getDayDate(3) },
+    ];
   });
 
   const [activities, setActivities] = useState<ActivityLog[]>(() => {
     const saved = localStorage.getItem('activities');
-    return saved ? JSON.parse(saved).map((a: any) => ({ ...a, timestamp: new Date(a.timestamp) })) : [];
+    if (saved) return JSON.parse(saved).map((a: any) => ({ ...a, timestamp: new Date(a.timestamp) }));
+    
+    return [
+      { id: 'a1', type: 'added', description: 'Added Thermodynamics class', timestamp: new Date(Date.now() - 1000 * 60 * 10), itemId: '1' },
+      { id: 'a2', type: 'edited', description: 'Updated Mechanical Lab timing', timestamp: new Date(Date.now() - 1000 * 60 * 45), itemId: '2' },
+      { id: 'a3', type: 'deleted', description: 'Deleted Mathematics lecture', timestamp: new Date(Date.now() - 1000 * 60 * 120), itemId: '5' },
+      { id: 'a4', type: 'restored', description: 'Restored Fluid Mechanics event', timestamp: new Date(Date.now() - 1000 * 60 * 300), itemId: '3' },
+    ];
   });
 
   const [isPanelOpen, setIsPanelOpen] = useState(false);
@@ -232,6 +261,7 @@ export default function App() {
   }, []);
 
   useEffect(() => {
+    document.body.classList.toggle('light', !isDarkMode);
     document.documentElement.classList.toggle('dark', isDarkMode);
     localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
   }, [isDarkMode]);
@@ -418,14 +448,14 @@ export default function App() {
       <NotificationTicker />
       
       {/* --- Header --- */}
-      <header className="fixed top-0 left-0 right-0 h-16 md:h-20 px-4 md:px-8 flex items-center justify-between z-40">
+      <header className="fixed top-0 left-0 right-0 h-16 md:h-20 px-4 md:px-8 flex items-center justify-between z-40 glass-panel border-b border-white/10 bg-black/10 backdrop-blur-xl">
         <div className="flex items-center gap-2 md:gap-4">
-          <div className="w-8 h-8 md:w-10 md:h-10 glass flex items-center justify-center">
-            <LayoutDashboard className="w-4 h-4 md:w-5 md:h-5 text-indigo-500" />
+          <div className="w-8 h-8 md:w-10 md:h-10 glass-card p-0 flex items-center justify-center bg-gradient-to-br from-indigo-500/20 to-purple-500/20 border-indigo-500/30">
+            <LayoutDashboard className="w-4 h-4 md:w-5 md:h-5 text-indigo-400 drop-shadow-[0_0_8px_rgba(129,140,248,0.5)]" />
           </div>
           <div>
-            <h1 className="text-sm md:text-lg font-semibold tracking-tight truncate max-w-[120px] md:max-w-none">Academic Time Table</h1>
-            <p className="text-[8px] md:text-[10px] opacity-50 uppercase tracking-widest font-bold hidden md:block">Academic Workspace</p>
+            <h1 className="text-sm md:text-lg font-bold tracking-tight truncate max-w-[120px] md:max-w-none text-white">Academic Time Table</h1>
+            <p className="text-[8px] md:text-[10px] opacity-70 uppercase tracking-widest font-black text-indigo-300 hidden md:block">Academic Workspace</p>
           </div>
         </div>
 
@@ -434,18 +464,18 @@ export default function App() {
           
           <button 
             onClick={() => setIsDarkMode(!isDarkMode)}
-            className="w-8 h-8 md:w-10 md:h-10 glass flex items-center justify-center hover:bg-white/20 transition-colors"
+            className="w-8 h-8 md:w-10 md:h-10 glass-card p-0 flex items-center justify-center hover:bg-white/20 transition-all active:scale-90"
           >
-            {isDarkMode ? <Sun className="w-4 h-4 md:w-5 md:h-5" /> : <Moon className="w-4 h-4 md:w-5 md:h-5" />}
+            {isDarkMode ? <Sun className="w-4 h-4 md:w-5 md:h-5 text-amber-400" /> : <Moon className="w-4 h-4 md:w-5 md:h-5 text-indigo-300" />}
           </button>
 
           <button 
             onClick={() => setIsPanelOpen(true)}
-            className="w-8 h-8 md:w-10 md:h-10 glass flex items-center justify-center hover:bg-white/20 transition-colors relative"
+            className="w-8 h-8 md:w-10 md:h-10 glass-card p-0 flex items-center justify-center hover:bg-white/20 transition-all relative active:scale-90"
           >
-            <History className="w-4 h-4 md:w-5 md:h-5" />
+            <History className="w-4 h-4 md:w-5 md:h-5 text-white/80" />
             {activities.length > 0 && (
-              <span className="absolute top-1.5 right-1.5 md:top-2 md:right-2 w-1.5 h-1.5 md:w-2 md:h-2 bg-indigo-500 rounded-full border-2 border-white/20" />
+              <span className="absolute top-1.5 right-1.5 md:top-2 md:right-2 w-1.5 h-1.5 md:w-2 md:h-2 bg-indigo-500 rounded-full border-2 border-white/40 shadow-[0_0_8px_rgba(99,102,241,0.8)]" />
             )}
           </button>
         </div>
@@ -458,7 +488,7 @@ export default function App() {
           <motion.div 
             initial={{ x: -20, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
-            className="glass p-6 space-y-8"
+            className="glass-panel bg-black/20 p-6 space-y-8 h-full"
           >
             <div className="flex justify-around items-center py-4 border-b border-white/10">
               <CircularProgress 
@@ -479,10 +509,10 @@ export default function App() {
               <h2 className="text-sm font-semibold opacity-60 uppercase tracking-widest">Quick Actions</h2>
               <button 
                 onClick={() => setIsAddModalOpen(true)}
-                className="w-full py-3 px-4 bg-cyan-500 hover:bg-cyan-600 text-black rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-cyan-500/20 font-bold uppercase tracking-wider text-xs"
+                className="w-full py-3 px-4 bg-gradient-to-br from-cyan-400 to-blue-600 hover:from-cyan-300 hover:to-blue-500 text-white rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-cyan-500/40 font-bold uppercase tracking-wider text-xs active:scale-95"
               >
-                <Plus className="w-4 h-4" />
-                <span>Add New Event</span>
+                <Plus className="w-4 h-4 drop-shadow-[0_0_5px_rgba(255,255,255,0.5)]" />
+                <span className="drop-shadow-sm">Add New Event</span>
               </button>
             </div>
 
@@ -530,13 +560,13 @@ export default function App() {
           <motion.div 
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            className="glass-panel flex-1 overflow-hidden flex flex-col"
+            className="glass-panel bg-white/[0.03] flex-1 overflow-hidden flex flex-col shadow-2xl"
           >
-            <div className="p-4 md:p-6 border-b border-white/10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="p-4 md:p-6 border-b border-white/10 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white/[0.02]">
               <div>
-                <h2 className="text-lg md:text-xl font-semibold">Weekly Timetable</h2>
+                <h2 className="text-lg md:text-xl font-bold text-white tracking-tight">Weekly Timetable</h2>
                 <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mt-1">
-                  <p className="text-[10px] md:text-xs opacity-50">Tue – Sat • 9:00 AM – 5:00 PM</p>
+                  <p className="text-[10px] md:text-xs font-medium text-white/50">Tue – Sat • 9:00 AM – 5:00 PM</p>
                   <div className="hidden md:block h-3 w-[1px] bg-white/10" />
                   <div className="flex items-center gap-3">
                     <span className="text-[10px] font-bold uppercase tracking-widest opacity-40">Show:</span>
@@ -617,25 +647,26 @@ export default function App() {
                           <div 
                             key={day} 
                             className={cn(
-                              "p-1 border-b border-r border-white/10 min-h-[80px] md:min-h-[100px] bg-white/[0.02] transition-all duration-500",
-                              isCurrentSlot && "active-slot bg-cyan-500/5"
+                              "p-1 border-b border-r border-white/10 min-h-[80px] md:min-h-[100px] bg-white/[0.01] transition-all duration-300 hover:bg-white/[0.05] group/cell relative",
+                              isCurrentSlot && "active-slot bg-cyan-500/10"
                             )}
                           >
+                            <div className="absolute inset-0 opacity-0 group-hover/cell:opacity-100 transition-opacity pointer-events-none bg-gradient-to-br from-cyan-500/5 to-transparent" />
                             {dayEvents.map(event => (
                               <div key={event.id} className={cn(
-                                "p-1.5 md:p-2 rounded-lg text-[8px] md:text-[10px] font-medium mb-1 shadow-sm border animate-in fade-in zoom-in-95 duration-300",
-                                event.type === 'lecture' ? 'bg-blue-500/10 text-blue-500 border-blue-500/30' :
-                                'bg-emerald-500/10 text-emerald-500 border-emerald-500/30'
+                                "p-1.5 md:p-2 rounded-lg text-[8px] md:text-[10px] font-medium mb-1 shadow-md border animate-in fade-in zoom-in-95 duration-300 relative z-10",
+                                event.type === 'lecture' ? 'bg-blue-600/20 text-blue-300 border-blue-500/40' :
+                                'bg-emerald-600/20 text-emerald-300 border-emerald-500/40'
                               )}>
-                                <div className="font-bold truncate text-xs md:text-sm mb-0.5">{event.subject}</div>
-                                <div className="opacity-70 flex items-center gap-1 mb-0.5 truncate">
+                                <div className="font-bold truncate text-xs md:text-sm mb-0.5 text-white">{event.subject}</div>
+                                <div className="opacity-90 flex items-center gap-1 mb-0.5 truncate text-white/80">
                                   <span className="opacity-50 hidden md:inline">Prof.</span> {event.faculty}
                                 </div>
-                                <div className="opacity-70 flex items-center gap-1 mb-1 truncate">
+                                <div className="opacity-90 flex items-center gap-1 mb-1 truncate text-white/80">
                                   <span className="opacity-50 hidden md:inline">Room</span> {event.room}
                                 </div>
-                                <div className="flex items-center justify-between mt-1 md:mt-2 pt-1 border-t border-current/10">
-                                  <span className="font-bold uppercase tracking-tighter text-[7px] md:text-[8px]">
+                                <div className="flex items-center justify-between mt-1 md:mt-2 pt-1 border-t border-white/10">
+                                  <span className="font-bold uppercase tracking-tighter text-[7px] md:text-[8px] text-white/60">
                                     {event.type === 'lecture' ? '📘' : '🧪'} <span className="hidden md:inline">{event.type === 'lecture' ? 'Lecture' : 'Lab'}</span>
                                   </span>
                                   <button 
@@ -643,7 +674,7 @@ export default function App() {
                                       e.stopPropagation();
                                       softDeleteEvent(event.id);
                                     }}
-                                    className="delete-event opacity-60 hover:opacity-100 transition-opacity text-red-500 font-bold uppercase text-[7px] md:text-[8px] px-1.5 py-0.5 hover:bg-red-500/10 rounded"
+                                    className="delete-event opacity-40 hover:opacity-100 transition-opacity text-rose-400 font-bold uppercase text-[7px] md:text-[8px] px-1.5 py-0.5 hover:bg-rose-500/20 rounded"
                                     data-id={event.id}
                                   >
                                     Del
