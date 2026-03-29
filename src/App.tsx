@@ -60,11 +60,80 @@ const GlassCard = ({ children, className, ...props }: any) => (
 );
 
 const Wallpaper = () => (
-  <div className="fixed inset-0 -z-10 overflow-hidden">
-    <div className="absolute inset-0 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 animate-gradient opacity-40 dark:opacity-60" />
-    <div className="absolute inset-0 backdrop-blur-[100px]" />
-  </div>
+  <>
+    <div className="mesh-gradient" />
+    <div className="hexagon-overlay" />
+  </>
 );
+
+const CircularProgress = ({ value, color, label, icon: Icon }: any) => {
+  const radius = 36;
+  const circumference = 2 * Math.PI * radius;
+  const offset = circumference - (value / 100) * circumference;
+
+  return (
+    <div className="flex flex-col items-center gap-2">
+      <div className="relative w-24 h-24">
+        <svg className="w-full h-full -rotate-90">
+          <circle
+            cx="48"
+            cy="48"
+            r={radius}
+            fill="transparent"
+            stroke="currentColor"
+            strokeWidth="8"
+            className="text-white/5"
+          />
+          <motion.circle
+            cx="48"
+            cy="48"
+            r={radius}
+            fill="transparent"
+            stroke={color}
+            strokeWidth="8"
+            strokeDasharray={circumference}
+            initial={{ strokeDashoffset: circumference }}
+            animate={{ strokeDashoffset: offset }}
+            transition={{ duration: 1.5, ease: "easeOut" }}
+            style={{ filter: `drop-shadow(0 0 8px ${color})` }}
+          />
+        </svg>
+        <div className="absolute inset-0 flex items-center justify-center">
+          <Icon className="w-6 h-6" style={{ color }} />
+        </div>
+      </div>
+      <div className="text-center">
+        <p className="text-[10px] uppercase tracking-widest opacity-60 font-medium">{label}</p>
+        <p className="text-sm font-bold tracking-tight">{value}%</p>
+      </div>
+    </div>
+  );
+};
+
+const NotificationTicker = () => {
+  const alerts = [
+    "Final Exam Schedule Released",
+    "Library hours extended for finals week",
+    "New research grant opportunities available",
+    "Guest lecture on Quantum Computing tomorrow at 2 PM",
+    "Campus-wide maintenance scheduled for Sunday"
+  ];
+
+  return (
+    <div className="fixed bottom-0 left-0 right-0 h-10 glass border-t-0 rounded-none flex items-center z-50">
+      <div className="marquee">
+        <div className="marquee-content gap-12 px-12">
+          {[...alerts, ...alerts].map((alert, i) => (
+            <div key={i} className="flex items-center gap-3 text-xs font-medium tracking-wide">
+              <div className="w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.8)]" />
+              {alert}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const TimeWidget = () => {
   const [now, setNow] = useState(new Date());
@@ -111,37 +180,33 @@ const TimeWidget = () => {
     <motion.div 
       initial={{ y: -20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
-      className="glass px-2 py-1 md:px-6 md:py-3 flex flex-col items-end gap-0 md:gap-1"
+      className="glass px-4 py-2 flex flex-col items-end gap-0.5"
     >
-      <div className="flex items-center gap-1.5 md:gap-3">
-        <span className="text-sm md:text-2xl font-light tracking-tight">
-          {format(now, 'h:mm a')}
+      <div className="flex items-center gap-2">
+        <span className="text-lg md:text-xl font-bold tracking-tighter text-cyan-400 drop-shadow-[0_0_8px_rgba(0,242,255,0.4)]">
+          {format(now, 'HH:mm')}
         </span>
         <div className={cn(
-          "w-1 h-1 md:w-2 md:h-2 rounded-full",
-          isWorkingHours ? "bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.6)]" : "bg-slate-400"
+          "w-1.5 h-1.5 rounded-full",
+          isWorkingHours ? "bg-cyan-400 shadow-[0_0_8px_rgba(0,242,255,0.8)]" : "bg-white/20"
         )} />
       </div>
       <div className="flex flex-col items-end">
-        <span className="text-[10px] md:text-xs font-medium opacity-60 uppercase tracking-wider md:tracking-widest">
-          <span className="hidden md:inline">{format(now, 'EEEE, d MMM')}</span>
-          <span className="md:hidden">{format(now, 'EEE, MMM d')}</span>
-        </span>
-        <span className="text-[8px] md:text-[10px] opacity-40 uppercase tracking-tighter hidden md:inline">
-          {isWorkingHours ? "College Hours" : "Outside Hours"}
+        <span className="text-[9px] font-bold opacity-60 uppercase tracking-widest text-white/70">
+          {format(now, 'EEE, d MMM')}
         </span>
         
         {weather && (
-          <div className="flex items-center gap-2 mt-1 opacity-60">
+          <div className="flex items-center gap-2 mt-0.5 opacity-80">
             <div className="flex items-center gap-1">
-              <Thermometer className="w-3 h-3" />
-              <span className="text-[10px] font-bold">{Math.round(weather.temp)}°C</span>
+              <Thermometer className="w-2.5 h-2.5 text-cyan-400" />
+              <span className="text-[9px] font-bold">{Math.round(weather.temp)}°C</span>
             </div>
             <div className="flex items-center gap-1">
-              {weather.condition === "Hot" ? <Sun className="w-3 h-3" /> : 
-               weather.condition === "Cool" ? <Cloud className="w-3 h-3" /> : 
-               <Droplets className="w-3 h-3" />}
-              <span className="text-[10px] font-bold uppercase tracking-wider">{weather.condition}</span>
+              {weather.condition === "Hot" ? <Sun className="w-2.5 h-2.5 text-amber-400" /> : 
+               weather.condition === "Cool" ? <Cloud className="w-2.5 h-2.5 text-blue-400" /> : 
+               <Droplets className="w-2.5 h-2.5 text-cyan-400" />}
+              <span className="text-[9px] font-bold uppercase tracking-wider">{weather.condition}</span>
             </div>
           </div>
         )}
@@ -401,6 +466,7 @@ export default function App() {
   return (
     <div className="min-h-screen w-full relative font-sans">
       <Wallpaper />
+      <NotificationTicker />
       
       {/* --- Header --- */}
       <header className="fixed top-0 left-0 right-0 h-16 md:h-20 px-4 md:px-8 flex items-center justify-between z-40">
@@ -443,22 +509,37 @@ export default function App() {
           <motion.div 
             initial={{ x: -20, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
-            className="glass-panel p-6 space-y-6"
+            className="glass p-6 space-y-8"
           >
+            <div className="flex justify-around items-center py-4 border-b border-white/10">
+              <CircularProgress 
+                value={Math.min(100, Math.max(0, Math.round(((new Date().getHours() * 60 + new Date().getMinutes()) - (9 * 60)) / (8 * 60) * 100)))} 
+                color="var(--color-neon-cyan)" 
+                label="Day Progress" 
+                icon={Clock}
+              />
+              <CircularProgress 
+                value={Math.min(100, Math.round((activeEvents.length / 25) * 100))} 
+                color="var(--color-neon-magenta)" 
+                label="Weekly Load" 
+                icon={LayoutDashboard}
+              />
+            </div>
+
             <div className="space-y-2">
               <h2 className="text-sm font-semibold opacity-60 uppercase tracking-widest">Quick Actions</h2>
               <button 
                 onClick={() => setIsAddModalOpen(true)}
-                className="w-full py-3 px-4 bg-indigo-500 hover:bg-indigo-600 text-white rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-indigo-500/20"
+                className="w-full py-3 px-4 bg-cyan-500 hover:bg-cyan-600 text-black rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-cyan-500/20 font-bold uppercase tracking-wider text-xs"
               >
                 <Plus className="w-4 h-4" />
-                <span className="text-sm font-medium">Add New Event</span>
+                <span>Add New Event</span>
               </button>
             </div>
 
             <div className="space-y-4 pt-4 border-t border-white/10">
               <h2 className="text-sm font-semibold opacity-60 uppercase tracking-widest">Navigation</h2>
-              <nav className="space-y-1">
+              <nav className="space-y-2">
                 {[
                   { icon: Calendar, label: 'Timetable', active: true },
                   { icon: Bell, label: 'Notifications', onClick: () => {
@@ -476,12 +557,18 @@ export default function App() {
                     key={item.label}
                     onClick={item.onClick}
                     className={cn(
-                      "w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all",
-                      item.active ? "bg-white/10 text-indigo-500" : "opacity-60 hover:opacity-100 hover:bg-white/5"
+                      "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm transition-all relative group",
+                      item.active ? "text-cyan-400" : "opacity-60 hover:opacity-100 hover:bg-white/5"
                     )}
                   >
-                    <item.icon className="w-4 h-4" />
-                    {item.label}
+                    {item.active && (
+                      <motion.div 
+                        layoutId="active-pill"
+                        className="absolute inset-0 bg-white/10 border-l-2 border-cyan-400 rounded-xl -z-10"
+                      />
+                    )}
+                    <item.icon className={cn("w-4 h-4", item.active && "drop-shadow-[0_0_5px_rgba(34,211,238,0.8)]")} />
+                    <span className="font-medium">{item.label}</span>
                   </button>
                 ))}
               </nav>
@@ -575,8 +662,16 @@ export default function App() {
                           return eventDayName === day && eventHour === hour;
                         });
                         
+                        const isCurrentSlot = format(new Date(), 'EEEE') === day && new Date().getHours() === hour;
+                        
                         return (
-                          <div key={day} className="p-1 border-b border-r border-white/10 min-h-[80px] md:min-h-[100px] bg-white/[0.02]">
+                          <div 
+                            key={day} 
+                            className={cn(
+                              "p-1 border-b border-r border-white/10 min-h-[80px] md:min-h-[100px] bg-white/[0.02] transition-all duration-500",
+                              isCurrentSlot && "active-slot bg-cyan-500/5"
+                            )}
+                          >
                             {dayEvents.map(event => (
                               <div key={event.id} className={cn(
                                 "p-1.5 md:p-2 rounded-lg text-[8px] md:text-[10px] font-medium mb-1 shadow-sm border animate-in fade-in zoom-in-95 duration-300",
