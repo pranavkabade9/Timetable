@@ -207,6 +207,11 @@ export default function App() {
     const getDayDate = (offset: number) => format(addDays(baseDate, offset), 'yyyy-MM-dd');
     
     return [
+      // Monday
+      { id: 'm1', subject: 'Machine Design', faculty: 'Dr. Kulkarni', room: 'A201', type: 'lecture', startTime: '09:00', endTime: '10:00', date: getDayDate(1) },
+      { id: 'm2', subject: 'Heat Transfer', faculty: 'Prof. Patil', room: 'A202', type: 'lecture', startTime: '10:00', endTime: '11:00', date: getDayDate(1) },
+      { id: 'm3', subject: 'CAD Lab', faculty: 'Dr. Deshmukh', room: 'Lab 4', type: 'lab', startTime: '11:00', endTime: '13:00', date: getDayDate(1) },
+      
       // Tuesday
       { id: '1', subject: 'Engineering Mathematics', faculty: 'Dr. Kulkarni', room: 'A101', type: 'lecture', startTime: '09:00', endTime: '10:00', date: getDayDate(2) },
       { id: '2', subject: 'Thermodynamics', faculty: 'Prof. Patil', room: 'A102', type: 'lecture', startTime: '10:00', endTime: '11:00', date: getDayDate(2) },
@@ -630,7 +635,7 @@ export default function App() {
               <div>
                 <h2 className="text-lg md:text-xl font-bold text-white tracking-tight">Weekly Timetable</h2>
                 <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mt-1">
-                  <p className="text-[10px] md:text-xs font-medium text-white/50">Tue – Sat • 9:00 AM – 5:00 PM</p>
+                  <p className="text-[10px] md:text-xs font-medium text-white/50">Mon – Sat • 9:00 AM – 5:00 PM</p>
                   <div className="hidden md:block h-3 w-[1px] bg-white/10" />
                   <div className="flex items-center gap-3">
                     <span className="text-[10px] font-bold uppercase tracking-widest opacity-40">Show:</span>
@@ -680,11 +685,11 @@ export default function App() {
             </div>
 
             <div className="flex-1 overflow-auto p-2 md:p-4 custom-scrollbar">
-              <div className="min-w-[700px] md:min-w-[800px]">
-                <div className="grid grid-cols-[80px_repeat(5,1fr)] md:grid-cols-[100px_repeat(5,1fr)] border border-white/10 rounded-xl overflow-hidden glass">
+              <div className="min-w-[800px] md:min-w-[1000px]">
+                <div className="grid grid-cols-[80px_repeat(6,1fr)] md:grid-cols-[100px_repeat(6,1fr)] border border-white/10 rounded-xl overflow-hidden glass">
                   {/* Header */}
                   <div className="bg-white/5 p-2 md:p-4 border-b border-r border-white/10 font-bold text-[8px] md:text-[10px] uppercase opacity-50">Time</div>
-                  {['Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map(day => {
+                  {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map(day => {
                     const isToday = format(new Date(), 'EEEE') === day;
                     return (
                       <div key={day} className={cn(
@@ -704,7 +709,7 @@ export default function App() {
                       <div className="p-2 md:p-4 border-b border-r border-white/10 text-[8px] md:text-[10px] font-bold opacity-40 flex items-center justify-center">
                         {format(setHours(new Date(), hour), 'h a')}
                       </div>
-                      {['Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map(day => {
+                      {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map(day => {
                         const dayEvents = activeEvents.filter(e => {
                           const eventDate = parseISO(e.date);
                           const eventDayName = format(eventDate, 'EEEE');
